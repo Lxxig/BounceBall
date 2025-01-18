@@ -1,10 +1,10 @@
-#include "Wall.h"
+#include "Block.h"
 
-Wall::Wall(const Vector2& position)
+Block::Block(const Vector2& position)
 	:DrawableActor("▒")
 {
 	// dnlcl tjfwjd.
 	this->position = position;
 	// 색상 설정.
-	color = Color::Green;
+	color = Color::LightAqua;
 }

@@ -1,6 +1,8 @@
 #include "Game.h"
 
 #include "Level/GameLevel.h"
+#include "Level/GameClearMenuLevel.h"
+#include "Level/MenuLevel.h"
 
 Game* Game::instance = nullptr;
 
@@ -8,52 +10,82 @@ Game::Game()
 	: Engine()
 {
 	instance = this;
-
-	gameLevel.PushBack(new GameLevel("../Assets/Maps/Stage1.txt"));
-	gameLevel.PushBack(new GameLevel("../Assets/Maps/Stage2.txt"));
-	gameLevel.PushBack(new GameLevel("../Assets/Maps/Stage3.txt"));
+	
+	stageAdress.PushBack("../Assets/Maps/Stage1.txt");
+	stageAdress.PushBack("../Assets/Maps/Stage2.txt");
+	stageAdress.PushBack("../Assets/Maps/Stage3.txt");
 }
-
-// mainLevel -> gmaeLevel
-// menuLevel -> menuLevel
-
-// mainLevel -> menuLevel
-// gameLevel -> gameLevel
 
 Game::~Game()
 {
-	if (showGame)
+	if (mainLevel->As<GameLevel>())
 	{
+		// backLevel = menuLevel or GameLevel인 상태.
 		delete backLevel;
 		backLevel = nullptr;
+		//menuLevel = nullptr;
 		mainLevel = nullptr;
 	}
 	else
 	{
+		// backLevel = GameLevel인 상태.
 		delete mainLevel;
 		mainLevel = nullptr;
+		menuLevel = nullptr;
 	}
-
-	for (int i = 0; i < gameLevel.Size(); ++i)
+	
+	if (menuLevel != nullptr)
 	{
-		delete gameLevel[i];
-		gameLevel[i] = nullptr;
+		delete menuLevel;
+		menuLevel = nullptr;
 	}
 }
 
 // mainLevel = menuLevel
 void Game::ToggleMenu()
 {
+	if (menuLevel == nullptr)
+	{
+		menuLevel = new MenuLevel();
+	}
+
 	system("cls");
 	//Clear();
-	showGame = !showGame;
-	if (showGame)
+	
+	// mainLevel과 backLevel 둘다 GameLevel이면 delete backLevel;
+	if(mainLevel->As<GameLevel>())
 	{
+		if(backLevel != nullptr)
+		{
+			if (backLevel->As<GameLevel>())
+			{
+				delete backLevel;
+				backLevel = nullptr;
+			}
+		}
 		backLevel = mainLevel;
-		mainLevel = gameLevel[stageIndex];
+		mainLevel = menuLevel;
 	}
 	else
 	{
 		mainLevel = backLevel;
+		backLevel = menuLevel;
+	}
+}
+
+void Game::ToggleGameClearMenu()
+{
+	system("cls");
+	//Clear();
+
+	// mainLevel이 GameLevel인 경우.
+	if (mainLevel->As<GameLevel>())
+	{
+		LoadLevel(new GameClearMenuLvel());
+	}
+	// mainLevel이 GameClearMenuLvel인 경우.
+	else if (mainLevel->As<GameClearMenuLvel>())
+	{
+		LoadLevel(new GameLevel(stageIndex));
 	}
 }

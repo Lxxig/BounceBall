@@ -1,13 +1,15 @@
 #include "GameLevel.h"
 #include "Engine/Engine.h"
+#include "Game/Game.h"
 
-#include "Actor/Wall.h"
+#include "Actor/Block.h"
 #include "Actor/Empty.h"
+#include "Actor/Star.h"
 #include "Actor/Player.h"
 
 #include "Engine/Timer.h"
 
-GameLevel::GameLevel(const char* stageAdress)
+GameLevel::GameLevel(int stageIndex)
 {
 	// 커서 감추기.
 	Engine::Get().SetCursorType(CursorType::NoCursor);
@@ -15,8 +17,12 @@ GameLevel::GameLevel(const char* stageAdress)
 	// 맵 파일 불러와 레벨 로드.
 	// 파일 읽기.
 
+	//char fileName[256];
+	//snprintf(fileName, 256, "../Assets/Maps/Stage%d.txt", stageIndex + 1);
+
 	FILE* file = nullptr;
-	fopen_s(&file, stageAdress, "rb");
+	fopen_s(&file, Game::Get().stageAdress[stageIndex], "rb");
+	//fopen_s(&file, fileName, "rb");
 
 	// 파일 처리.
 	if (file == nullptr)
@@ -71,12 +77,12 @@ GameLevel::GameLevel(const char* stageAdress)
 			continue;
 		}
 
-		// 맵 문자가 1이면 wall 액터 생성.
+		// 맵 문자가 1이면 block 액터 생성.
 		if (mapChar == '1')
 		{
-			Wall* wall = new Wall(Vector2(xPosition, yPosition));
-			actors.PushBack(wall);
-			map.PushBack(wall);
+			Block* block = new Block(Vector2(xPosition, yPosition));
+			actors.PushBack(block);
+			map.PushBack(block);
 		}
 
 		// 맵 문자가 .이면 그라운드 액터 생성.
@@ -85,6 +91,21 @@ GameLevel::GameLevel(const char* stageAdress)
 			Empty* empty = new Empty(Vector2(xPosition, yPosition));
 			actors.PushBack(empty);
 			map.PushBack(empty);
+		}
+
+		// 맵 문자가 5이면 그라운드 액터 생성.
+		else if (mapChar == '5')
+		{
+			// 스테이지에 존재하는 스타 개수 저장.
+			++stageStarCount;
+
+			Empty* empty = new Empty(Vector2(xPosition, yPosition));
+			actors.PushBack(empty);
+			map.PushBack(empty);
+
+			Star* star = new Star(Vector2(xPosition, yPosition));
+			actors.PushBack(star);
+			//stars.PushBack(star);
 		}
 
 		// 맵 문자가 p이면 그라운드 액터 생성.
@@ -110,7 +131,22 @@ GameLevel::GameLevel(const char* stageAdress)
 
 void GameLevel::Update(float deltaTime)
 {
+	// 제거된 star을 제외하고 남은 star들을 stars에 푸쉬
+	stars.Clear();
+	for (Actor* actor : actors)
+	{
+		Star* star = actor->As<Star>();
+		if (star)
+		{
+			stars.PushBack(star);
+		}
+	}
+
+	// 게임이 클리어 되었는지 확인.
+	CheckGameClear();
+
 	Super::Update(deltaTime);
+
 
 	// 게임이 클리어 됐으면, 게임 종료 처리.
 	if (isGameClear)
@@ -123,8 +159,11 @@ void GameLevel::Update(float deltaTime)
 			return;
 		}
 
+		const char* gameClearText = "GameClear!";
+		size_t gameClearTextLength = strlen(gameClearText);
+
 		// 커서 이동.
-		Engine::Get().SetCursorPosition(0, Engine::Get().ScreenSize().y);
+		Engine::Get().SetCursorPosition(Engine::Get().ScreenSize().x / 2 - (int)gameClearTextLength / 2, Engine::Get().ScreenSize().y/2 - 4);
 
 		// 메시지 출력.
 		Log("GameClear!");
@@ -132,7 +171,8 @@ void GameLevel::Update(float deltaTime)
 		// 쓰레드 정지.
 		Sleep(2000);
 
-		Engine::Get().QuitGame();
+		// Level 전환.
+		Game::Get().ToggleGameClearMenu();
 	}
 }
 
@@ -140,14 +180,36 @@ void GameLevel::Draw()
 {
 	// 덮어 쓸거라 Super을 하면안됨.
 	// 맵 그리기.
+
 	for (auto* actor : map)
 	{
 		// 플레이어 위치 확인.
 		if (actor->Position() == player->Position()) continue;
 
+		// 스타가 있으면 Draw그리지 않게하는 변수.
+		bool isStar = false;
+		for (auto* star : stars)
+		{
+			if (actor->Position() == star->Position())
+			{
+				isStar = true;
+				break;
+			}
+		}
+
+		if (isStar) continue;
 		
 		// 맵 액터 그리기.
 		actor->Draw();
+	}
+
+	// 스타 그리기.
+	for (auto* star : stars)
+	{
+		// 플레이어 위치 확인.
+		if (star->Position() == player->Position()) continue;
+
+		star->Draw();
 	}
 
 	// 플레이어 그리기.
@@ -160,6 +222,22 @@ bool GameLevel::CanPlayerMove(const Vector2& position)
 	if (isGameClear)
 	{
 		return false;
+	}
+
+	//for (Star* star : stars)
+	for (int ix = 0; ix < stars.Size(); ++ix)
+	{
+		Star* star = stars[ix];
+
+		// 검색한 액터가 star인지 확인.
+		if (star->Position() == position)
+		{
+			// Star라면 스타를 스타를 획득 후 제거.
+			star->Destroy();
+			++starCount;
+			
+			return true;
+		}
 	}
 
 	// 이동하려는 위치에 벽이 있는지 확인.
@@ -179,11 +257,10 @@ bool GameLevel::CanPlayerMove(const Vector2& position)
 	if (searchedActor)
 	{
 		// 검색한 액터가 벽인지 확인.
-		if (searchedActor->As<Wall>())
+		if (searchedActor->As<Block>())
 		{
 			return false;
 		}
-
 
 		// 검색한 액터가 이동가능한 빈칸이면 이동,,.
 		if (searchedActor->As<Empty>())
@@ -195,5 +272,10 @@ bool GameLevel::CanPlayerMove(const Vector2& position)
 
 bool GameLevel::CheckGameClear()
 {
+	// 스타를 다 모았으면 게임 클리어.
+	if (starCount == stageStarCount)
+	{
+		isGameClear = true;
+	}
 	return false;
 }

@@ -4,6 +4,8 @@
 #include "Level/GameLevel.h"
 #include "Engine/Timer.h"
 
+#include "Level/MenuLevel.h"
+
 Player::Player(const Vector2& position, GameLevel* level)
 	: DrawableActor("●"), refLevel(level)
 {
@@ -18,10 +20,8 @@ void Player::Update(float deltaTime)
 {
 	Super::Update(deltaTime);
 	
-	// ESC 종료.
 	if (Engine::Get().GetKeyDown(VK_ESCAPE))
 	{
-		// Engine::Get().QuitGame();
 		// 메뉴 토글.
 		Game::Get().ToggleMenu();
 	}

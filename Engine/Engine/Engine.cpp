@@ -11,7 +11,7 @@
 Engine* Engine::instance = nullptr;
 
 Engine::Engine()
-	: quit(false), mainLevel(nullptr), screenSize(70, 26)
+	: quit(false), mainLevel(nullptr), screenSize(80, 20)
 {
 	// 랜덤 시드 설정.
 	srand((unsigned int)time(nullptr));
@@ -52,6 +52,7 @@ Engine::~Engine()
 	if (mainLevel != nullptr)
 	{
 		delete mainLevel;
+		mainLevel = nullptr;
 	}
 
 	// 클리어 버퍼 삭제.
@@ -145,6 +146,10 @@ void Engine::Run()
 void Engine::LoadLevel(Level* newLevel)
 {
 	// 기존 레벨이 있다면 삭제 후 교체.
+	if (mainLevel)
+	{
+		delete mainLevel;
+	}
 
 	// 메인 레벨 설정.
 	mainLevel = newLevel;

@@ -44,12 +44,14 @@ public:
 	virtual void Draw() override;
 
 private:
+	List<MenuItem*> menuItems;
 	int currentIndex = 0;
+
 	Color selectedColor = Color::Green;
 	Color unselectedColor = Color::White;
 
-	List<MenuItem*> menuItems;
 	int length = 0;
+	//int currentStageType = 0;
 
 	StageType currentStageType = StageType::Stage1;
 };

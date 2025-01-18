@@ -7,24 +7,32 @@ class Game : public Engine
 {
 public:
 	Game();
-	~Game();
+	virtual ~Game();
 
 	void ToggleMenu();
 
-	//Getter.
-	void SetStageIndex(int stageIndex) { this->stageIndex = stageIndex; }
-	//int GetStageIndex() const { return stageIndex; }
+	// Getter.
+	inline void SetStageIndex(int stageIndex) { this->stageIndex = stageIndex; }
+	const int GetStageIndex() { return stageIndex; }
+
+	// 삭제된 메뉴레벨을 nullptr로 지정.
+	void SetMenuLvelToNullptr() { this->menuLevel = nullptr; }
+
+	// GameAndClearOrOverToggleMenu() 생성.
+	void ToggleGameClearMenu();
 
 	static Game& Get() { return *instance; }
 
+public:
+	List<const char*> stageAdress;
+
 private:
-	bool showGame = false;
+	int stageIndex = -1;
 
-	// 게임 스테이지 관리.
-	List<Level*> gameLevel;
-	int stageIndex = 0;
-
+	Level* menuLevel = nullptr;
 	Level* backLevel = nullptr;
+
+	//Level* backGameClearMenuLevel = nullptr;
 
 private:
 	static Game* instance;
