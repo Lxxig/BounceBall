@@ -81,42 +81,41 @@ GameLevel::GameLevel(int stageIndex)
 		if (mapChar == '1')
 		{
 			Block* block = new Block(Vector2(xPosition, yPosition));
-			actors.PushBack(block);
-			map.PushBack(block);
+			actors.emplace_back(block);
+			map.emplace_back(block);
 		}
 
-		// 맵 문자가 .이면 그라운드 액터 생성.
+		// 맵 문자가 .이면 empty 액터 생성.
 		else if (mapChar == '.')
 		{
 			Empty* empty = new Empty(Vector2(xPosition, yPosition));
-			actors.PushBack(empty);
-			map.PushBack(empty);
+			actors.emplace_back(empty);
+			map.emplace_back(empty);
 		}
 
-		// 맵 문자가 5이면 그라운드 액터 생성.
+		// 맵 문자가 5이면 star 액터 생성.
 		else if (mapChar == '5')
 		{
 			// 스테이지에 존재하는 스타 개수 저장.
 			++stageStarCount;
 
 			Empty* empty = new Empty(Vector2(xPosition, yPosition));
-			actors.PushBack(empty);
-			map.PushBack(empty);
+			actors.emplace_back(empty);
+			map.emplace_back(empty);
 
 			Star* star = new Star(Vector2(xPosition, yPosition));
-			actors.PushBack(star);
-			//stars.PushBack(star);
+			actors.emplace_back(star);
 		}
 
-		// 맵 문자가 p이면 그라운드 액터 생성.
+		// 맵 문자가 p이면 player 액터 생성.
 		else if (mapChar == 'p')
 		{
 			Empty* empty = new Empty(Vector2(xPosition, yPosition));
-			actors.PushBack(empty);
-			map.PushBack(empty);
+			actors.emplace_back(empty);
+			map.emplace_back(empty);
 
 			player = new Player(Vector2(xPosition, yPosition), this);
-			actors.PushBack(player);
+			actors.emplace_back(player);
 		}
 
 		++xPosition;
@@ -132,13 +131,13 @@ GameLevel::GameLevel(int stageIndex)
 void GameLevel::Update(float deltaTime)
 {
 	// 제거된 star을 제외하고 남은 star들을 stars에 푸쉬
-	stars.Clear();
+	stars.clear();
 	for (Actor* actor : actors)
 	{
 		Star* star = actor->As<Star>();
 		if (star)
 		{
-			stars.PushBack(star);
+			stars.emplace_back(star);
 		}
 	}
 
@@ -225,7 +224,7 @@ bool GameLevel::CanPlayerMove(const Vector2& position)
 	}
 
 	//for (Star* star : stars)
-	for (int ix = 0; ix < stars.Size(); ++ix)
+	for (int ix = 0; ix < stars.size(); ++ix)
 	{
 		Star* star = stars[ix];
 

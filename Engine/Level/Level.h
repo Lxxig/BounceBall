@@ -2,7 +2,7 @@
 
 #include "Core.h"
 #include "RTTI.h"
-#include "Container/List.h"
+#include <vector>
 
 // 전방 선언(Forward Declaration).
 class Actor;
@@ -28,7 +28,7 @@ public:
 
 protected:
 	// 게임 공간에 배치되는 물체(액터) 배열.
-	List<Actor*> actors;
+	std::vector<Actor*> actors;
 
 	// 추가 요청된 액터.
 	Actor* addRequestedActor = nullptr;

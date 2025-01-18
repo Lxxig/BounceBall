@@ -5,19 +5,43 @@
 
 GameClearMenuLvel::GameClearMenuLvel()
 {
-	// 다음 스테이지로 이동.
-	menuItems.PushBack(new MenuItem("Next Stage!", []() {
-		// 다음 스테이지 로드.
-		Game::Get().LoadLevel(new GameLevel(Game::Get().GetStageIndex() + 1));
-		// 다음 스테이지 인데스 정보를 Game 클래스에 전달.
-		Game::Get().SetStageIndex(Game::Get().GetStageIndex() + 1);
-	}));
+	// 클리어할 다음 스테이지가 존재할 경우.
+	if (Game::Get().GetStageIndex() + 1 < Game::Get().stageAdress.size())
+	{
+		// 다음 스테이지로 이동.
+		menuItems.emplace_back(new MenuItem("Next Stage!", []() {
+			// 다음 스테이지 로드.
+			Game::Get().LoadLevel(new GameLevel(Game::Get().GetStageIndex() + 1));
+			// 다음 스테이지 인데스 정보를 Game 클래스에 전달.
+			Game::Get().SetStageIndex(Game::Get().GetStageIndex() + 1);
+			}));
 
-	menuItems.PushBack(new MenuItem("QuitGame", []() {
-		Game::Get().QuitGame();
-		}));
+		// 메뉴로 돌아가기.
+		menuItems.emplace_back(new MenuItem("Menu", []() {
+			Game::Get().LoadLevel(new MenuLevel());
+			}));
 
-	length = menuItems.Size();
+		menuItems.emplace_back(new MenuItem("QuitGame", []() {
+			Game::Get().QuitGame();
+			}));
+	}
+
+	// 모든 스테이지를 다 클리어한 경우.
+	else if (Game::Get().GetStageIndex() + 1 >= Game::Get().stageAdress.size())
+	{
+		// 메뉴로 돌아가기.
+		menuItems.emplace_back(new MenuItem("Menu (Clear all stages)", []() {
+			Game::Get().LoadLevel(new MenuLevel());
+			}));
+
+		menuItems.emplace_back(new MenuItem("QuitGame", []() {
+			Game::Get().QuitGame();
+			}));
+
+	}
+
+	// 메뉴 선택지 개수 저장.
+	length = (int)menuItems.size();
 }
 
 GameClearMenuLvel::~GameClearMenuLvel()

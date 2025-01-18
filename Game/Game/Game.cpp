@@ -11,26 +11,36 @@ Game::Game()
 {
 	instance = this;
 	
-	stageAdress.PushBack("../Assets/Maps/Stage1.txt");
-	stageAdress.PushBack("../Assets/Maps/Stage2.txt");
-	stageAdress.PushBack("../Assets/Maps/Stage3.txt");
+	stageAdress.emplace_back("../Assets/Maps/Stage1.txt");
+	stageAdress.emplace_back("../Assets/Maps/Stage2.txt");
+	stageAdress.emplace_back("../Assets/Maps/Stage3.txt");
 }
 
 Game::~Game()
 {
 	if (mainLevel->As<GameLevel>())
 	{
-		// backLevel = menuLevel or GameLevel인 상태.
+		// backLevel = menuLevel.
 		delete backLevel;
 		backLevel = nullptr;
-		//menuLevel = nullptr;
-		mainLevel = nullptr;
-	}
-	else
-	{
-		// backLevel = GameLevel인 상태.
 		delete mainLevel;
 		mainLevel = nullptr;
+	}
+	// mainLevel과 menuLevel인 상태
+	else
+	{
+		delete mainLevel;
+		mainLevel = nullptr;
+
+		// backLevel이 menuLevel이 아닌 다른 스테이지 레벨(GameLevel)이면 delete.
+		if(backLevel != nullptr)
+		{
+			if (backLevel->As<GameLevel>())
+			{
+				delete backLevel;
+				backLevel = nullptr;
+			}
+		}
 		menuLevel = nullptr;
 	}
 	
@@ -39,6 +49,22 @@ Game::~Game()
 		delete menuLevel;
 		menuLevel = nullptr;
 	}
+}
+
+void Game::LoadLevel(Level* newLevel)
+{
+	// 기존 레벨이 존재하면 제거.
+	if (mainLevel != nullptr)
+	{
+		// 기존 레벨이 MenuLevel이면 nullptr 초기화.
+		if(mainLevel->As<MenuLevel>())
+		{
+			menuLevel = nullptr;
+		}
+		delete mainLevel;
+	}
+
+	mainLevel = newLevel;
 }
 
 // mainLevel = menuLevel
@@ -52,7 +78,9 @@ void Game::ToggleMenu()
 	system("cls");
 	//Clear();
 	
-	// mainLevel과 backLevel 둘다 GameLevel이면 delete backLevel;
+	// 기존 stage와 메뉴에서 선택한 stage가 다를 때
+	// backLevel에 남아 있는 기존stage(GameLevel)을
+	// 먼저 delete한 후 backLevel에 mainLevel 저장.
 	if(mainLevel->As<GameLevel>())
 	{
 		if(backLevel != nullptr)

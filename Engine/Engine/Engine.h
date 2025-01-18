@@ -34,7 +34,7 @@ public:
 	void Run();
 
 	// 레벨 추가 함수.
-	void LoadLevel(Level* newLevel);
+	virtual void LoadLevel(Level* newLevel);
 
 	// 액터 추가/삭제 함수.
 	void AddActor(Actor* newActor);
@@ -62,11 +62,12 @@ public:
 	// 싱글톤 객체 접근 함수.
 	static Engine& Get();
 
+	void Clear();						// 화면 지우기.
+
 protected:
 	void ProcessInput();				// 입력 처리.
 	void Update(float deltaTime);		// Tick();
 
-	void Clear();						// 화면 지우기.
 	void Draw();						// Render();
 
 	// 이전 프레임의 키 상태를 저장하는 함수.

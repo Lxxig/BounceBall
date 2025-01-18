@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Level/Level.h"
-#include "Container/List.h"
+#include <vector>
 
 enum class StageType
 {
@@ -44,7 +44,7 @@ public:
 	virtual void Draw() override;
 
 private:
-	List<MenuItem*> menuItems;
+	std::vector<MenuItem*> menuItems;
 	int currentIndex = 0;
 
 	Color selectedColor = Color::Green;

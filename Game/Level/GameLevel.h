@@ -2,6 +2,7 @@
 
 #include <Level/Level.h>
 #include <Math/Vector2.h>
+#include <vector>
 
 // 소코반 게임 레벨.
 class DrawableActor;
@@ -37,10 +38,10 @@ private:
 
 private:
 	// 벽/땅 액터 배열.
-	List<DrawableActor*> map;
+	std::vector<DrawableActor*> map;
 
 	// 스타.
-	List<Star*> stars;
+	std::vector<Star*> stars;
 
 	// 플레이어.
 	Player* player = nullptr;

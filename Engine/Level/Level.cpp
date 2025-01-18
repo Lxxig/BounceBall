@@ -23,24 +23,23 @@ void Level::AddActor(Actor* newActor)
 
 void Level::ProcessAddedAndDestroyedActor()
 {
-	// 액터 순회 후 삭제 요청된 액터를 처리.
-	for (int ix = 0; ix < actors.Size();)
+	for (auto it = actors.begin(); it != actors.end();)
 	{
-		if (actors[ix]->isExpired)
+		if ((*it)->isExpired)
 		{
-			delete actors[ix];
-			actors[ix] = nullptr;
-			actors.Erase(ix);
-			continue;
+			delete* it;
+			it = actors.erase(it);
 		}
-
-		++ix;
+		else
+		{
+			++it;
+		}
 	}
 
 	// 추가 요청된 액터 처리.
 	if (addRequestedActor)
 	{
-		actors.PushBack(addRequestedActor);
+		actors.emplace_back(addRequestedActor);
 		addRequestedActor = nullptr;
 	}
 }

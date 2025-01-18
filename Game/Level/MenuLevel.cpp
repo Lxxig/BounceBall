@@ -4,11 +4,8 @@
 
 MenuLevel::MenuLevel()
 {
-	menuItems.PushBack(new MenuItem("Stage1", []()
+	menuItems.emplace_back(new MenuItem("Stage1", []()
 		{
-			// 삭제될 Game클래스의 메뉴 레벨을 nullptr로 설정.
-			Game::Get().SetMenuLvelToNullptr();
-
 			if(Game::Get().GetStageIndex() != (int)StageType::Stage1)
 			{
 				// 해당 스테이지가 로드되어 있지않으면 로드.
@@ -23,11 +20,8 @@ MenuLevel::MenuLevel()
 			// 스테이지 인덱스 정보를 Game 클래스에 저장.
 			Game::Get().SetStageIndex((int)StageType::Stage1);
 		}));
-	menuItems.PushBack(new MenuItem("Stage2", []()
+	menuItems.emplace_back(new MenuItem("Stage2", []()
 		{
-			// 삭제될 Game클래스의 메뉴 레벨을 nullptr로 설정.
-			Game::Get().SetMenuLvelToNullptr();
-
 			if (Game::Get().GetStageIndex() != (int)StageType::Stage2)
 			{
 				// 해당 스테이지가 로드되어 있지않으면 로드.
@@ -42,11 +36,8 @@ MenuLevel::MenuLevel()
 			// 스테이지 인덱스 정보를 Game 클래스에 저장.
 			Game::Get().SetStageIndex((int)StageType::Stage2);
 		}));
-	menuItems.PushBack(new MenuItem("Stage3", []()
+	menuItems.emplace_back(new MenuItem("Stage3", []()
 		{
-			// 삭제될 Game클래스의 메뉴 레벨을 nullptr로 설정.
-			Game::Get().SetMenuLvelToNullptr();
-
 			if (Game::Get().GetStageIndex() != (int)StageType::Stage3)
 			{
 				// 해당 스테이지가 로드되어 있지않으면 로드.
@@ -61,8 +52,8 @@ MenuLevel::MenuLevel()
 			// 스테이지 인덱스 정보를 Game 클래스에 저장.
 			Game::Get().SetStageIndex((int)StageType::Stage3);
 		}));
-	menuItems.PushBack(new MenuItem("Quit Game", []() { Game::Get().QuitGame(); }));
-	length = menuItems.Size();
+	menuItems.emplace_back(new MenuItem("Quit Game", []() { Game::Get().QuitGame(); }));
+	length = (int)menuItems.size();
 }
 
 MenuLevel::~MenuLevel()
@@ -98,6 +89,7 @@ void MenuLevel::Update(float deltaTime)
 void MenuLevel::Draw()
 {
 	Super::Draw();
+	Engine::Get().Clear();
 
 	Engine::Get().SetCursorPosition(0, 0);
 	

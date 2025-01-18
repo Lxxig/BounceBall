@@ -2,6 +2,7 @@
 
 #include "Level/Level.h"
 #include "Container/List.h"
+#include <vector>
 
 class GameClearMenuLvel : public Level
 {
@@ -15,7 +16,7 @@ public:
 	virtual void Draw() override;
 
 private:
-	List<struct MenuItem*> menuItems;
+	std::vector<struct MenuItem*> menuItems;
 	int currentIndex = 0;
 
 	Color selectedColor = Color::Green;
