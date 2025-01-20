@@ -89,6 +89,10 @@ GameLevel::GameLevel(int stageIndex)
 		// 2: DoubleJump
 		// 5: Star
 
+		// 제거 처리를 해야하는 actor의 경우 메모리 관리를 추가로 해줘야 하기때문에
+		// map에는 포함시키지 않는다.
+		// map에는 메모리 관리를 해 줄 필요가 없는 액터들만 추가한다.
+
 		// 맵 문자가 1이면 block 액터 생성.
 		if (mapChar == '1')
 		{
@@ -106,21 +110,18 @@ GameLevel::GameLevel(int stageIndex)
 		}
 
 		// 맵 문자가 .이면 empty 액터 생성.
-		else if (mapChar == '.')
-		{
-			Empty* empty = new Empty(Vector2(xPosition, yPosition));
-			actors.emplace_back(empty);
-			map.emplace_back(empty);
-		}
+		//else if (mapChar == '.')
+		//{
+		//	/*Empty* empty = new Empty(Vector2(xPosition, yPosition));
+		//	actors.emplace_back(empty);
+		//	map.emplace_back(empty);*/
+		//}
 
 		// 맵 문자가 e이면 ExtinctionBlock 액터 생성.
 		if (mapChar == 'e')
 		{
-			Empty* empty = new Empty(Vector2(xPosition, yPosition));
-			actors.emplace_back(empty);
-			map.emplace_back(empty);
-
 			ExtinctionBlock* extinctionBlock = new ExtinctionBlock(Vector2(xPosition, yPosition));
+			extinctionBlocks.emplace_back(extinctionBlock);
 			actors.emplace_back(extinctionBlock);
 		}
 
@@ -130,21 +131,14 @@ GameLevel::GameLevel(int stageIndex)
 			// 스테이지에 존재하는 스타 개수 저장.
 			++stageStarCount;
 
-			Empty* empty = new Empty(Vector2(xPosition, yPosition));
-			actors.emplace_back(empty);
-			map.emplace_back(empty);
-
 			Star* star = new Star(Vector2(xPosition, yPosition));
+			stars.push_back(star);
 			actors.emplace_back(star);
 		}
 
 		// 맵 문자가 p이면 player 액터 생성.
 		else if (mapChar == 'p')
 		{
-			Empty* empty = new Empty(Vector2(xPosition, yPosition));
-			actors.emplace_back(empty);
-			map.emplace_back(empty);
-
 			player = new Player(Vector2(xPosition, yPosition), this);
 			actors.emplace_back(player);
 		}
@@ -161,27 +155,6 @@ GameLevel::GameLevel(int stageIndex)
 
 void GameLevel::Update(float deltaTime)
 {
-	// 제거된 star을 제외하고 남은 star들을 stars에 푸쉬
-	stars.clear();
-	// 제거된 extinctionBlock 제외하고 남은 extinctionBlock들을 extinctionBlocks에 푸쉬.
-	extinctionBlocks.clear();
-
-	for (Actor* actor : actors)
-	{
-		Star* star = actor->As<Star>();
-		if (star)
-		{
-			stars.emplace_back(star);
-		}
-
-		ExtinctionBlock* extinctionBlock = actor->As<ExtinctionBlock>();
-		if (extinctionBlock)
-		{
-			extinctionBlocks.emplace_back(extinctionBlock);
-		}
-	}
-
-
 	// 게임 오버 됐는지 확인.
 	CheckGameOver();
 
@@ -206,10 +179,10 @@ void GameLevel::Update(float deltaTime)
 		size_t gameClearTextLength = strlen(gameClearText);
 
 		// 커서 이동.
-		Engine::Get().SetCursorPosition(Engine::Get().ScreenSize().x / 2 - (int)gameClearTextLength / 2, Engine::Get().ScreenSize().y/2 - 4);
+		Vector2 cursorPosition(Engine::Get().ScreenSize().x / 2 - (int)gameClearTextLength / 2, Engine::Get().ScreenSize().y / 2 - 4);
 
 		// 메시지 출력.
-		Log(gameClearText);
+		Engine::Get().Draw(cursorPosition, gameClearText);
 
 		// 쓰레드 정지.
 		Sleep(2000);
@@ -229,76 +202,34 @@ void GameLevel::Update(float deltaTime)
 			return;
 		}
 
-		const char* gameOverText = "GameOver!";
-		size_t gameOverTextLength = strlen(gameOverText);
+		const char* GameOverText = "GameClear!";
+		size_t GameOverTextLength = strlen(GameOverText);
 
 		// 커서 이동.
-		Engine::Get().SetCursorPosition(Engine::Get().ScreenSize().x / 2 - (int)gameOverTextLength / 2, Engine::Get().ScreenSize().y / 2 - 4);
+		Vector2 cursorPosition(Engine::Get().ScreenSize().x / 2 - (int)GameOverTextLength / 2, Engine::Get().ScreenSize().y / 2 - 4);
 
 		// 메시지 출력.
-		Log(gameOverText);
+		Engine::Get().Draw(cursorPosition, GameOverText);
 
 		// 쓰레드 정지.
 		Sleep(2000);
 
-		// GmaeOverMenuLevel 전환.
+		// Level 전환.
 		Game::Get().ToggleGameClearOrOverMenu();
 	}
 }
 
 void GameLevel::Draw()
 {
-	// 덮어 쓸거라 Super을 하면안됨.
-	// 맵 그리기.
+	// 해당 스테이지 출력.
+	char StageName[10];
+	snprintf(StageName, 10, "Stage%d", stageIndex + 1);
+	Vector2 cursorPositon(Engine::Get().ScreenSize().x / 2 - (int)strlen(StageName) / 2, 0);
+	Engine::Get().Draw(cursorPositon, StageName);
 
-	for (auto* actor : map)
+	for (auto* actor : actors)
 	{
-		// 플레이어 위치 확인.
-		if (actor->Position() == player->Position()) continue;
-
-		// 스타가 있으면 Draw그리지 않게하는 변수.
-		bool isStar = false;
-		for (auto* star : stars)
-		{
-			if (actor->Position() == star->Position())
-			{
-				isStar = true;
-				break;
-			}
-		}
-
-		if (isStar) continue;
-
-		// ExtinctionBlock이 있으면 Draw그리지 않게하는 변수.
-		bool isExtinctionBlock = false;
-		for (auto* extinctionBlock : extinctionBlocks)
-		{
-			if (actor->Position() == extinctionBlock->Position())
-			{
-				isExtinctionBlock = true;
-				break;
-			}
-		}
-
-		if (isExtinctionBlock) continue;
-		
-		// 맵 액터 그리기.
 		actor->Draw();
-	}
-
-	// 스타 그리기.
-	for (auto* star : stars)
-	{
-		// 플레이어 위치 확인.
-		if (star->Position() == player->Position()) continue;
-
-		star->Draw();
-	}
-
-	// ExtinctionBlock 그리기.
-	for (auto* extinctionBlock : extinctionBlocks)
-	{
-		extinctionBlock->Draw();
 	}
 
 	// 플레이어 그리기.
@@ -313,31 +244,36 @@ bool GameLevel::CanPlayerMove(const Vector2& position)
 		return false;
 	}
 
-	//for (Star* star : stars)
-	for (int ix = 0; ix < stars.size(); ++ix)
+	// 스타 획득 로직.
+	for (auto it = stars.begin(); it!=stars.end(); ++it)
 	{
-		Star* star = stars[ix];
-
-		// 검색한 액터가 star인지 확인.
-		if (star->Position() == position)
+		// 플레이어의 다음 위치가 star면 스타를 제거.
+		if ((*it)->Position() == position)
 		{
-			// Star라면 스타를 스타를 획득 후 제거.
-			star->Destroy();
+			// 메모리 해제.
+			(*it)->Destroy();
+			// stars벡터 내부에서 해제된 노드(요소)를 제거.
+			it = stars.erase(it);
+
 			++starCount;
-			
+
 			return true;
 		}
 	}
 
-	// 검색한 액터가 ExtinctionBlock인지 확인.
-	for (auto* extinctionBlock : extinctionBlocks)
+	// ExtinctionBlock 부서지는 로직.
+	for (auto it = extinctionBlocks.begin(); it != extinctionBlocks.end(); ++ it)
 	{
-		if (extinctionBlock->Position() == position)
+		if ((*it)->Position() == position)
 		{
-			// 이전 위치와 현재 위치의 y좌표가 다르고, x좌표가 같을 때만 부서지게 설정.
 			if (prePosition.y < position.y && prePosition.x == position.x)
 			{
-				extinctionBlock->Destroy();
+				// 메모리 해제.
+				(*it)->Destroy();
+
+				// stars벡터 내부에서 해제된 노드(요소)를 제거.
+				it = extinctionBlocks.erase(it);
+
 			}
 
 			return false;
@@ -362,16 +298,17 @@ bool GameLevel::CanPlayerMove(const Vector2& position)
 	// 검색 가능한 액터가 존재하는지 확인.
 	if (searchedActor)
 	{
-		// 검색한 액터가 Block지 확인.
-		if (searchedActor->As<Block>())
-		{
-			return false;
-		}
-
 		// 검색한 액터가 ThornBlock인지 확인.
 		if (searchedActor->As<ThornBlock>())
 		{
 			isGameOver = true;
+			return false;
+		}
+
+		// 검색한 액터가 Block지 확인.
+		if (searchedActor->As<Block>())
+		{
+			return false;
 		}
 
 		// 검색한 액터가 이동가능한 빈칸이면 이동,,.
@@ -390,8 +327,7 @@ bool GameLevel::CheckGameClear()
 		isGameClear = true;
 		return true;
 	}
-	isGameClear = false;
-	return false;
+	return isGameClear;
 }
 
 bool GameLevel::CheckGameOver()
@@ -401,6 +337,5 @@ bool GameLevel::CheckGameOver()
 		isGameOver = true;
 		return true;
 	}
-	isGameOver = false;
-	return false;
+	return isGameOver;
 }

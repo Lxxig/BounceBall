@@ -13,17 +13,10 @@ struct KeyState
 	bool wasKeyDown = false;
 };
 
-// 커서의 종류를 설정할 때 사용할 열거형.
-enum class CursorType
-{
-	NoCursor,
-	SolidCursor,
-	NormalCursor
-};
-
 // 엔진 클래스.
 class Level;
 class Actor;
+class ScreenBuffer;
 class ENGINE_API Engine
 {
 public:
@@ -42,8 +35,10 @@ public:
 
 	// 화면 좌표 관련 함수.
 	void SetCursorType(CursorType cursorType);
-	void SetCursorPosition(const Vector2& position);
-	void SetCursorPosition(int x, int y);
+	//void SetCursorPosition(const Vector2& position);
+	//void SetCursorPosition(int x, int y);
+
+	void Draw(const Vector2& position, const char* image, Color color = Color::White);
 
 	// 화면 크기 반환 함수.
 	inline Vector2 ScreenSize() const { return screenSize; }
@@ -62,16 +57,19 @@ public:
 	// 싱글톤 객체 접근 함수.
 	static Engine& Get();
 
-	void Clear();						// 화면 지우기.
-
 protected:
 	void ProcessInput();				// 입력 처리.
 	void Update(float deltaTime);		// Tick();
 
+	void Clear();						// 화면 지우기.
 	void Draw();						// Render();
+	void Present();
 
 	// 이전 프레임의 키 상태를 저장하는 함수.
 	void SavePreviouseKeyStates();
+
+	inline ScreenBuffer* GetRenderer() const { return renderTargets[currentRenderTargetIndex]; }
+	void ClearImageBuffer();
 
 protected:
 
@@ -100,6 +98,9 @@ protected:
 	Vector2 screenSize;
 
 	// 화면 지울 때 사용할 버퍼(Buffer/Blob).
-	char* emptyStringBuffer = nullptr;
+	CHAR_INFO* imageBuffer = nullptr;
 
+	// 화면 버퍼.
+	ScreenBuffer* renderTargets[2];
+	int currentRenderTargetIndex = 0;
 };

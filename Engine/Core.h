@@ -21,14 +21,22 @@ enum class Color
 	White = Red + Green + Blue,
 };
 
+// 커서의 종류를 설정할 때 사용할 열거형.
+enum class CursorType
+{
+	NoCursor,
+	SolidCursor,
+	NormalCursor
+};
+
 // 콘솔 색상 설정 함수.
 inline void SetColor(Color color)
 {
 	SetConsoleTextAttribute(
 		GetStdHandle(STD_OUTPUT_HANDLE), 
-		(int)color);
+		(int)color
+	);
 }
-
 
 // 메모리 삭제 함수.
 template<typename T>
@@ -54,19 +62,21 @@ void Log(const char* format, T&&... args)
 inline int Random(int min, int max)
 {
 	// 차이 구하기.
-	int deff = (max - min) + 1;
-	return ((deff * rand()) / (RAND_MAX + 1)) + min;
+	int diff = (max - min) + 1;
+	return ((diff * rand()) / (RAND_MAX + 1)) + min;
 }
 
-// min ~ max 사이의 랜덤 값을 반환해주는 함수.
+// min~max 사이의 랜덤 값을 반환해주는 함수.
 inline float RandomPercent(float min, float max)
 {
 	float random = (float)(rand() / (float)RAND_MAX);
 	return random * (max - min) + min;
 }
 
+// 메모리 누수 확인할 때 사용하는 함수.
 inline void CheckMemoryLeak()
 {
+	// https://learn.microsoft.com/ko-kr/cpp/c-runtime-library/find-memory-leaks-using-the-crt-library?view=msvc-170
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 }
 

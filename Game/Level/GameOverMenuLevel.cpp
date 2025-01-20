@@ -18,7 +18,7 @@ GameOverMenuLevel::GameOverMenuLevel()
 	// 메뉴로 돌아가기.
 	menuItems.emplace_back(new MenuItem("Menu", []() {
 		// 돌아갈 때 남는 찌꺼기 제거.
-		Engine::Get().Clear();
+		//Engine::Get().Clear();
 		Game::Get().LoadLevel(new MenuLevel());
 		}));
 
@@ -60,14 +60,15 @@ void GameOverMenuLevel::Draw()
 {
 	Super::Draw();
 
-	Engine::Get().SetCursorPosition(0, 0);
+	// 출력 될 위치.
+	const char* printText = "GameOverMenu";
+	Vector2 cursorPositon(Engine::Get().ScreenSize().x / 2 - (int)strlen(printText) / 2, 0);
+	Engine::Get().Draw(cursorPositon, printText);
 
-	SetColor(unselectedColor);
-	Log("GameOverMenu\n\n");
-
-	for (int ix = 0; ix < length; ++ix)
+	for (int ix = 0; ix < menuItems.size(); ++ix)
 	{
-		SetColor(ix == currentIndex ? selectedColor : unselectedColor);
-		Log("%s\n", menuItems[ix]->menuText);
+		//SetColor(ix == currentIndex ? selectedColor : unselectedColor);
+		Color setColor = (ix == currentIndex) ? selectedColor : unselectedColor;
+		Engine::Get().Draw(Vector2(2, ix + 3), menuItems[ix]->menuText, setColor);
 	}
 }

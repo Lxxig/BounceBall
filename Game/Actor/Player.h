@@ -17,8 +17,8 @@ private:
 	GameLevel* refLevel = nullptr;
 
 	// 딜레이 관련 변수.
-	float xDelayTime = 0.05f;
-	float yDelayTime = 0.07f;
+	float xDelayTime = 0.09f;
+	float yDelayTime = 0.09f;
 
 	// 공의 상태 확인 변수.
 	bool isBallDown = true;

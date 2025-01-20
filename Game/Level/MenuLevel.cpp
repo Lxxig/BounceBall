@@ -93,17 +93,14 @@ void MenuLevel::Draw()
 {
 	Super::Draw();
 
-	// GameClaer or GameOverMenuLevel에서 남은 찌거기 지우기.
-	//Engine::Get().Clear();
+	// 출력 될 위치.
+	const char* printText = "BounceBall";
+	Vector2 cursorPositon(Engine::Get().ScreenSize().x / 2 - (int)strlen(printText) / 2, 0);
+	Engine::Get().Draw(cursorPositon, printText);
 
-	Engine::Get().SetCursorPosition(0, 0);
-	
-	SetColor(unselectedColor);
-	Log("BounceBall Game\n\n");
-
-	for (int ix = 0; ix < length; ++ix)
+	for (int ix = 0; ix < menuItems.size(); ++ix)
 	{
-		SetColor(ix == currentIndex ? selectedColor : unselectedColor);
-		Log("%s\n", menuItems[ix]->menuText);
+		Color setColor = (ix == currentIndex) ? selectedColor : unselectedColor;
+		Engine::Get().Draw(Vector2(2, ix+3), menuItems[ix]->menuText, setColor);
 	}
 }

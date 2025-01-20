@@ -9,6 +9,7 @@ class ENGINE_API DrawableActor : public Actor
 
 public:
 	DrawableActor(const char* image = "");
+	//virtual ~DrawableActor() = default;
 	virtual ~DrawableActor();
 
 	virtual void Draw() override;
@@ -21,12 +22,13 @@ public:
 	inline int Width() const { return width; }
 
 protected:
+
 	// 화면에 그릴 문자 값.
 	char* image;
 
-	// 너비(image 문자열의 길이).
+	// 너비(문자열 길이).
 	int width = 0;
 
-	// 색상
+	// 색상 값.
 	Color color = Color::White;
 };

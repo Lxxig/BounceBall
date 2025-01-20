@@ -23,6 +23,7 @@ void Level::AddActor(Actor* newActor)
 
 void Level::ProcessAddedAndDestroyedActor()
 {
+	// 액터 순회 후 삭제 요청된 액터를 처리.
 	for (auto it = actors.begin(); it != actors.end();)
 	{
 		if ((*it)->isExpired)
@@ -30,7 +31,7 @@ void Level::ProcessAddedAndDestroyedActor()
 			delete* it;
 			it = actors.erase(it);
 		}
-		else
+		else 
 		{
 			++it;
 		}

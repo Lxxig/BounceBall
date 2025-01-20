@@ -7,7 +7,8 @@
 #include "Level/MenuLevel.h"
 
 Player::Player(const Vector2& position, GameLevel* level)
-	: DrawableActor("●"), refLevel(level)
+	//: DrawableActor("●"), refLevel(level)
+	: DrawableActor("0"), refLevel(level)
 {
 	// 위치 설정.
 	this->position = position;
@@ -94,11 +95,6 @@ void Player::Update(float deltaTime)
 				Vector2(position.x - 1, position.y))
 				)
 			{
-				// 점프한 상태에서만 이동.
-				/*if (position.y != previousPositionY)
-				{
-					--position.x;
-				}*/
 
 				--position.x;
 			}
@@ -111,11 +107,6 @@ void Player::Update(float deltaTime)
 				Vector2(position.x + 1, position.y))
 				)
 			{
-				// 점프한 상태에서만 이동.
-				/*if (position.y != previousPositionY)
-				{
-					++position.x;
-				}*/
 
 				++position.x;
 			}

@@ -1,7 +1,7 @@
 #include "ExtinctionBlock.h"
 
 ExtinctionBlock::ExtinctionBlock(const Vector2& position)
-	:DrawableActor("бр")
+	:DrawableActor("E")
 {
 	this->position = position;
 

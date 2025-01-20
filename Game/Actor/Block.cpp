@@ -1,7 +1,7 @@
 ﻿#include "Block.h"
 
 Block::Block(const Vector2& position)
-	:DrawableActor("▒")
+	:DrawableActor("B")
 {
 	// dnlcl tjfwjd.
 	this->position = position;
