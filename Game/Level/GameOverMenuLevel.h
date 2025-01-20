@@ -1,11 +1,26 @@
 #pragma once
 
-#include "MenuLevel.h"
+#include "Level/Level.h"
+#include "Container/List.h"
+#include <vector>
 
-class GameOverMenuLvel : public MenuLevel
+class GameOverMenuLevel : public Level
 {
-	RTTI_DECLARATIONS(GameOverMenuLvel, MenuLevel)
+	RTTI_DECLARATIONS(GameOverMenuLevel, Level)
 
 public:
+	GameOverMenuLevel();
+	~GameOverMenuLevel();
 
+	virtual void Update(float deltaTime) override;
+	virtual void Draw() override;
+
+private:
+	std::vector<struct MenuItem*> menuItems;
+	int currentIndex = 0;
+
+	Color selectedColor = Color::Green;
+	Color unselectedColor = Color::White;
+
+	int length = 0;
 };

@@ -18,7 +18,7 @@ public:
 	const int GetStageIndex() { return stageIndex; }
 
 	// GameAndClearOrOverToggleMenu() »ý¼º.
-	void ToggleGameClearMenu();
+	void ToggleGameClearOrOverMenu();
 
 	static Game& Get() { return *instance; }
 

@@ -4,6 +4,9 @@
 
 MenuLevel::MenuLevel()
 {
+	// 커서 감추기.
+	Engine::Get().SetCursorType(CursorType::NoCursor);
+
 	menuItems.emplace_back(new MenuItem("Stage1", []()
 		{
 			if(Game::Get().GetStageIndex() != (int)StageType::Stage1)
@@ -89,7 +92,9 @@ void MenuLevel::Update(float deltaTime)
 void MenuLevel::Draw()
 {
 	Super::Draw();
-	Engine::Get().Clear();
+
+	// GameClaer or GameOverMenuLevel에서 남은 찌거기 지우기.
+	//Engine::Get().Clear();
 
 	Engine::Get().SetCursorPosition(0, 0);
 	

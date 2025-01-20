@@ -1,10 +1,10 @@
-#include "Block.h"
+ï»¿#include "Block.h"
 
 Block::Block(const Vector2& position)
-	:DrawableActor("¢Æ")
+	:DrawableActor("â–’")
 {
 	// dnlcl tjfwjd.
 	this->position = position;
-	// »ö»ó ¼³Á¤.
+	// ìƒ‰ìƒ ì„¤ì •.
 	color = Color::LightAqua;
 }

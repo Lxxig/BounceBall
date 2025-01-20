@@ -5,6 +5,9 @@
 
 GameClearMenuLvel::GameClearMenuLvel()
 {
+	// 커서 감추기.
+	Engine::Get().SetCursorType(CursorType::NoCursor);
+
 	// 클리어할 다음 스테이지가 존재할 경우.
 	if (Game::Get().GetStageIndex() + 1 < Game::Get().stageAdress.size())
 	{
@@ -18,6 +21,8 @@ GameClearMenuLvel::GameClearMenuLvel()
 
 		// 메뉴로 돌아가기.
 		menuItems.emplace_back(new MenuItem("Menu", []() {
+			// 돌아갈 때 남는 찌꺼기 제거.
+			Engine::Get().Clear();
 			Game::Get().LoadLevel(new MenuLevel());
 			}));
 
@@ -81,7 +86,7 @@ void GameClearMenuLvel::Draw()
 	Engine::Get().SetCursorPosition(0, 0);
 
 	SetColor(unselectedColor);
-	Log("ClearGameMenu\n\n");
+	Log("GameClearMenu\n\n");
 
 	for (int ix = 0; ix < length; ++ix)
 	{

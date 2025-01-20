@@ -8,6 +8,7 @@
 class DrawableActor;
 class Player;
 class Star;
+class ExtinctionBlock;
 class GameLevel : public Level
 {
 	RTTI_DECLARATIONS(GameLevel, Level)
@@ -28,6 +29,8 @@ public:
 	// 게임 스테이지 확인 인덱스.
 	inline void SetStageIndex(int stageIndex) { this->stageIndex = stageIndex; }
 	inline int GetStageIndex() { return stageIndex; }
+	inline bool IsGameClear() { return isGameClear; }
+	inline bool IsGameOver() { return isGameOver; }
 
 private:
 	// 별을 다 모아서 클리어 했는지 확인.
@@ -43,8 +46,14 @@ private:
 	// 스타.
 	std::vector<Star*> stars;
 
+	// ExtinctionBlock
+	std::vector<ExtinctionBlock*> extinctionBlocks;
+
 	// 플레이어.
 	Player* player = nullptr;
+
+	// 플레이어의 이전 위치 저장 변수.
+	Vector2 prePosition;
 
 	// 스테이지 스타 개수 저장 변수.
 	int stageStarCount = 0;

@@ -2,8 +2,10 @@
 #include "Engine/Engine.h"
 #include "Game/Game.h"
 
-#include "Actor/Block.h"
 #include "Actor/Empty.h"
+#include "Actor/Block.h"
+#include "Actor/ThornBlock.h"
+#include "Actor/ExtinctionBlock.h"
 #include "Actor/Star.h"
 #include "Actor/Player.h"
 
@@ -77,6 +79,16 @@ GameLevel::GameLevel(int stageIndex)
 			continue;
 		}
 
+		// 블럭
+		// .: Empty
+		// 0: ThornBlock
+		// 1: Block
+		// e: ExtinctionBlock
+		// 
+		// 아이템.
+		// 2: DoubleJump
+		// 5: Star
+
 		// 맵 문자가 1이면 block 액터 생성.
 		if (mapChar == '1')
 		{
@@ -85,12 +97,31 @@ GameLevel::GameLevel(int stageIndex)
 			map.emplace_back(block);
 		}
 
+		// 맵 문자가 0이면 ThornBlock 액터 생성.
+		if (mapChar == '0')
+		{
+			ThornBlock* thornBlock = new ThornBlock(Vector2(xPosition, yPosition));
+			actors.emplace_back(thornBlock);
+			map.emplace_back(thornBlock);
+		}
+
 		// 맵 문자가 .이면 empty 액터 생성.
 		else if (mapChar == '.')
 		{
 			Empty* empty = new Empty(Vector2(xPosition, yPosition));
 			actors.emplace_back(empty);
 			map.emplace_back(empty);
+		}
+
+		// 맵 문자가 e이면 ExtinctionBlock 액터 생성.
+		if (mapChar == 'e')
+		{
+			Empty* empty = new Empty(Vector2(xPosition, yPosition));
+			actors.emplace_back(empty);
+			map.emplace_back(empty);
+
+			ExtinctionBlock* extinctionBlock = new ExtinctionBlock(Vector2(xPosition, yPosition));
+			actors.emplace_back(extinctionBlock);
 		}
 
 		// 맵 문자가 5이면 star 액터 생성.
@@ -132,6 +163,9 @@ void GameLevel::Update(float deltaTime)
 {
 	// 제거된 star을 제외하고 남은 star들을 stars에 푸쉬
 	stars.clear();
+	// 제거된 extinctionBlock 제외하고 남은 extinctionBlock들을 extinctionBlocks에 푸쉬.
+	extinctionBlocks.clear();
+
 	for (Actor* actor : actors)
 	{
 		Star* star = actor->As<Star>();
@@ -139,7 +173,17 @@ void GameLevel::Update(float deltaTime)
 		{
 			stars.emplace_back(star);
 		}
+
+		ExtinctionBlock* extinctionBlock = actor->As<ExtinctionBlock>();
+		if (extinctionBlock)
+		{
+			extinctionBlocks.emplace_back(extinctionBlock);
+		}
 	}
+
+
+	// 게임 오버 됐는지 확인.
+	CheckGameOver();
 
 	// 게임이 클리어 되었는지 확인.
 	CheckGameClear();
@@ -147,7 +191,7 @@ void GameLevel::Update(float deltaTime)
 	Super::Update(deltaTime);
 
 
-	// 게임이 클리어 됐으면, 게임 종료 처리.
+	// 게임이 클리어 됐으면, 게임 클리어 메뉴에서 선택.
 	if (isGameClear)
 	{
 		// 대략 한 프레임 정도의 시간 대기.
@@ -165,13 +209,40 @@ void GameLevel::Update(float deltaTime)
 		Engine::Get().SetCursorPosition(Engine::Get().ScreenSize().x / 2 - (int)gameClearTextLength / 2, Engine::Get().ScreenSize().y/2 - 4);
 
 		// 메시지 출력.
-		Log("GameClear!");
+		Log(gameClearText);
 
 		// 쓰레드 정지.
 		Sleep(2000);
 
 		// Level 전환.
-		Game::Get().ToggleGameClearMenu();
+		Game::Get().ToggleGameClearOrOverMenu();
+		isGameOver = false;
+	}
+
+	if (isGameOver)
+	{
+		// 대략 한 프레임 정도의 시간 대기.
+		static Timer timer(0.1f);
+		timer.Update(deltaTime);
+		if (!timer.IsTimeOut())
+		{
+			return;
+		}
+
+		const char* gameOverText = "GameOver!";
+		size_t gameOverTextLength = strlen(gameOverText);
+
+		// 커서 이동.
+		Engine::Get().SetCursorPosition(Engine::Get().ScreenSize().x / 2 - (int)gameOverTextLength / 2, Engine::Get().ScreenSize().y / 2 - 4);
+
+		// 메시지 출력.
+		Log(gameOverText);
+
+		// 쓰레드 정지.
+		Sleep(2000);
+
+		// GmaeOverMenuLevel 전환.
+		Game::Get().ToggleGameClearOrOverMenu();
 	}
 }
 
@@ -197,6 +268,19 @@ void GameLevel::Draw()
 		}
 
 		if (isStar) continue;
+
+		// ExtinctionBlock이 있으면 Draw그리지 않게하는 변수.
+		bool isExtinctionBlock = false;
+		for (auto* extinctionBlock : extinctionBlocks)
+		{
+			if (actor->Position() == extinctionBlock->Position())
+			{
+				isExtinctionBlock = true;
+				break;
+			}
+		}
+
+		if (isExtinctionBlock) continue;
 		
 		// 맵 액터 그리기.
 		actor->Draw();
@@ -209,6 +293,12 @@ void GameLevel::Draw()
 		if (star->Position() == player->Position()) continue;
 
 		star->Draw();
+	}
+
+	// ExtinctionBlock 그리기.
+	for (auto* extinctionBlock : extinctionBlocks)
+	{
+		extinctionBlock->Draw();
 	}
 
 	// 플레이어 그리기.
@@ -239,6 +329,23 @@ bool GameLevel::CanPlayerMove(const Vector2& position)
 		}
 	}
 
+	// 검색한 액터가 ExtinctionBlock인지 확인.
+	for (auto* extinctionBlock : extinctionBlocks)
+	{
+		if (extinctionBlock->Position() == position)
+		{
+			// 이전 위치와 현재 위치의 y좌표가 다르고, x좌표가 같을 때만 부서지게 설정.
+			if (prePosition.y < position.y && prePosition.x == position.x)
+			{
+				extinctionBlock->Destroy();
+			}
+
+			return false;
+		}
+	}
+
+	prePosition = Vector2(position);
+
 	// 이동하려는 위치에 벽이 있는지 확인.
 	DrawableActor* searchedActor = nullptr;
 
@@ -255,10 +362,16 @@ bool GameLevel::CanPlayerMove(const Vector2& position)
 	// 검색 가능한 액터가 존재하는지 확인.
 	if (searchedActor)
 	{
-		// 검색한 액터가 벽인지 확인.
+		// 검색한 액터가 Block지 확인.
 		if (searchedActor->As<Block>())
 		{
 			return false;
+		}
+
+		// 검색한 액터가 ThornBlock인지 확인.
+		if (searchedActor->As<ThornBlock>())
+		{
+			isGameOver = true;
 		}
 
 		// 검색한 액터가 이동가능한 빈칸이면 이동,,.
@@ -275,6 +388,19 @@ bool GameLevel::CheckGameClear()
 	if (starCount == stageStarCount)
 	{
 		isGameClear = true;
+		return true;
 	}
+	isGameClear = false;
+	return false;
+}
+
+bool GameLevel::CheckGameOver()
+{
+	if (player->Position().y >= Game::Get().ScreenSize().y - 1 && isGameClear != true)
+	{
+		isGameOver = true;
+		return true;
+	}
+	isGameOver = false;
 	return false;
 }

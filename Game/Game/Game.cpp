@@ -1,8 +1,9 @@
 #include "Game.h"
 
 #include "Level/GameLevel.h"
-#include "Level/GameClearMenuLevel.h"
 #include "Level/MenuLevel.h"
+#include "Level/GameClearMenuLevel.h"
+#include "Level/GameOverMenuLevel.h"
 
 Game* Game::instance = nullptr;
 
@@ -81,6 +82,7 @@ void Game::ToggleMenu()
 	// 기존 stage와 메뉴에서 선택한 stage가 다를 때
 	// backLevel에 남아 있는 기존stage(GameLevel)을
 	// 먼저 delete한 후 backLevel에 mainLevel 저장.
+	// 그렇지 않을 경우 memory leak이 발생한다.
 	if(mainLevel->As<GameLevel>())
 	{
 		if(backLevel != nullptr)
@@ -101,19 +103,20 @@ void Game::ToggleMenu()
 	}
 }
 
-void Game::ToggleGameClearMenu()
+void Game::ToggleGameClearOrOverMenu()
 {
 	system("cls");
 	//Clear();
 
-	// mainLevel이 GameLevel인 경우.
-	if (mainLevel->As<GameLevel>())
+	// 게임을 클리어한 경우.
+	if(mainLevel->As<GameLevel>()->IsGameClear())
 	{
 		LoadLevel(new GameClearMenuLvel());
 	}
-	// mainLevel이 GameClearMenuLvel인 경우.
-	else if (mainLevel->As<GameClearMenuLvel>())
+
+	// 게임 오버인 경우.
+	else if (mainLevel->As<GameLevel>()->IsGameOver())
 	{
-		LoadLevel(new GameLevel(stageIndex));
+		LoadLevel(new GameOverMenuLevel());
 	}
 }
