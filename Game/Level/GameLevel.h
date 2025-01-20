@@ -9,6 +9,8 @@ class DrawableActor;
 class Player;
 class Star;
 class ExtinctionBlock;
+class Block;
+class MoveBlock;
 class GameLevel : public Level
 {
 	RTTI_DECLARATIONS(GameLevel, Level)
@@ -25,6 +27,9 @@ public:
 
 	// 플레이어가 이동 가능한 지 확인하는 함수.
 	bool CanPlayerMove(const Vector2& position);
+
+	// moveBlock이 이동가능한지 확인하는 함수.
+	bool CanMoveBlock(const Vector2& position);
 
 	// 게임 스테이지 확인 인덱스.
 	inline void SetStageIndex(int stageIndex) { this->stageIndex = stageIndex; }
@@ -48,6 +53,21 @@ private:
 
 	// ExtinctionBlock
 	std::vector<ExtinctionBlock*> extinctionBlocks;
+
+	// MoveBlocks
+	std::vector<MoveBlock*> moveBlocks;
+
+	// MoveBlock
+	MoveBlock* moveBlock = nullptr;
+
+	// TargetPosition 무브블럭의 도착지의 좌표를 저장하는 변수.
+	std::vector<Vector2> moveBlockTargetPosition;
+
+	// MoveBlock의 수를 저장하는 변수.
+	int MoveBlockCount = -1;
+
+	// MoveBlock을 계속 만들지 말지 결정하는 변수.
+	bool makeMoveBlock = false;
 
 	// 플레이어.
 	Player* player = nullptr;

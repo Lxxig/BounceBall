@@ -4,6 +4,7 @@
 
 #include "Actor/Empty.h"
 #include "Actor/Block.h"
+#include "Actor/MoveBlock.h"
 #include "Actor/ThornBlock.h"
 #include "Actor/ExtinctionBlock.h"
 #include "Actor/Star.h"
@@ -93,10 +94,58 @@ GameLevel::GameLevel(int stageIndex)
 		// map에는 포함시키지 않는다.
 		// map에는 메모리 관리를 해 줄 필요가 없는 액터들만 추가한다.
 
+
+		// 맵 문자가 t이면 MoveBlockStartPosition의 targetPosition에 저장 저장.
+		if (mapChar == 't')
+		{
+			// 맵 문자가 t이면 makeMoveBlock의 상태를 변경한다.
+			makeMoveBlock = !makeMoveBlock;
+
+			if (makeMoveBlock)
+			{
+				// t의 포지션을 저장.
+				moveBlockTargetPosition.push_back(Vector2(xPosition, yPosition));
+
+				if (moveBlock == nullptr)
+				{
+					// 무브블럭 액터 생성.
+					moveBlock = new MoveBlock(Vector2(xPosition + 1, yPosition), this);
+				}
+				// 무브 블럭 개수 증가.
+				++MoveBlockCount;
+			}
+			else
+			{
+				// 무브블럭의 크기가 1 block 이상이면 moveBlocks에 포함
+				if (moveBlock == nullptr || moveBlock->GetBlockSize())
+				{
+					moveBlocks.emplace_back(moveBlock);
+					moveBlock = nullptr;
+				}
+			}
+		}
+
 		// 맵 문자가 1이면 block 액터 생성.
 		if (mapChar == '1')
 		{
 			Block* block = new Block(Vector2(xPosition, yPosition));
+			if (makeMoveBlock)
+			{
+				// moveBlockTargetPosition사이에 있는 블럭들을 모아서 무브블럭 만들기.
+				// t 111     t  -> 블럭 3개짜리 무브 블럭이 만들어진다.
+				moveBlock->SetMoveBlock(block);
+			}
+			//else
+			//{
+			//	// 무브블럭의 크기가 1 block 이상이면 moveBlocks에 포함
+			//	if (moveBlock == nullptr || moveBlock->GetBlockSize())
+			//	{
+			//		moveBlocks.emplace_back(moveBlock);
+			//		//actors.emplace_back(moveBlock);
+			//		moveBlock = nullptr;
+			//	}
+			//}
+
 			actors.emplace_back(block);
 			map.emplace_back(block);
 		}
@@ -163,6 +212,11 @@ void GameLevel::Update(float deltaTime)
 
 	Super::Update(deltaTime);
 
+	for (auto* block : moveBlocks)
+	{
+		block->Update(deltaTime);
+	}
+
 
 	// 게임이 클리어 됐으면, 게임 클리어 메뉴에서 선택.
 	if (isGameClear)
@@ -179,6 +233,7 @@ void GameLevel::Update(float deltaTime)
 		size_t gameClearTextLength = strlen(gameClearText);
 
 		// 커서 이동.
+		//Engine::Get().ScreenSize().y / 2 - 4
 		Vector2 cursorPosition(Engine::Get().ScreenSize().x / 2 - (int)gameClearTextLength / 2, Engine::Get().ScreenSize().y / 2 - 4);
 
 		// 메시지 출력.
@@ -202,7 +257,7 @@ void GameLevel::Update(float deltaTime)
 			return;
 		}
 
-		const char* GameOverText = "GameClear!";
+		const char* GameOverText = "GameOver!";
 		size_t GameOverTextLength = strlen(GameOverText);
 
 		// 커서 이동.
@@ -223,7 +278,7 @@ void GameLevel::Draw()
 {
 	// 해당 스테이지 출력.
 	char StageName[10];
-	snprintf(StageName, 10, "Stage%d", stageIndex + 1);
+	snprintf(StageName, 10, "STAGE-%d", stageIndex + 1);
 	Vector2 cursorPositon(Engine::Get().ScreenSize().x / 2 - (int)strlen(StageName) / 2, 0);
 	Engine::Get().Draw(cursorPositon, StageName);
 
@@ -245,7 +300,7 @@ bool GameLevel::CanPlayerMove(const Vector2& position)
 	}
 
 	// 스타 획득 로직.
-	for (auto it = stars.begin(); it!=stars.end(); ++it)
+	for (auto it = stars.begin(); it != stars.end(); ++it)
 	{
 		// 플레이어의 다음 위치가 star면 스타를 제거.
 		if ((*it)->Position() == position)
@@ -262,7 +317,7 @@ bool GameLevel::CanPlayerMove(const Vector2& position)
 	}
 
 	// ExtinctionBlock 부서지는 로직.
-	for (auto it = extinctionBlocks.begin(); it != extinctionBlocks.end(); ++ it)
+	for (auto it = extinctionBlocks.begin(); it != extinctionBlocks.end(); ++it)
 	{
 		if ((*it)->Position() == position)
 		{
@@ -312,11 +367,26 @@ bool GameLevel::CanPlayerMove(const Vector2& position)
 		}
 
 		// 검색한 액터가 이동가능한 빈칸이면 이동,,.
-		if (searchedActor->As<Empty>())
+		/*if (searchedActor->As<Empty>())
 		{
 			return true;
-		}
+		}*/
 	}
+
+	// 빈칸이면.
+	return true;
+}
+
+bool GameLevel::CanMoveBlock(const Vector2& position)
+{
+	// 게임이 클리어된 경우 바로 종료.
+	if (isGameClear)
+	{
+		return false;
+	}
+
+	if( position.x )
+	return true;
 }
 
 bool GameLevel::CheckGameClear()

@@ -181,6 +181,8 @@
   <ItemGroup>
     <ClCompile Include="actor\Empty.cpp" />
     <ClCompile Include="Actor\ExtinctionBlock.cpp" />
+    <ClCompile Include="Actor\MoveBlock.cpp" />
+    <ClCompile Include="Actor\MoveBlock.h" />
     <ClCompile Include="actor\Player.cpp" />
     <ClCompile Include="actor\Block.cpp" />
     <ClCompile Include="Actor\Star.cpp" />

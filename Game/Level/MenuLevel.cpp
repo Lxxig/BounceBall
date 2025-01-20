@@ -7,7 +7,7 @@ MenuLevel::MenuLevel()
 	// 커서 감추기.
 	Engine::Get().SetCursorType(CursorType::NoCursor);
 
-	menuItems.emplace_back(new MenuItem("Stage1", []()
+	menuItems.emplace_back(new MenuItem("STAGE1", []()
 		{
 			if(Game::Get().GetStageIndex() != (int)StageType::Stage1)
 			{
@@ -23,7 +23,7 @@ MenuLevel::MenuLevel()
 			// 스테이지 인덱스 정보를 Game 클래스에 저장.
 			Game::Get().SetStageIndex((int)StageType::Stage1);
 		}));
-	menuItems.emplace_back(new MenuItem("Stage2", []()
+	menuItems.emplace_back(new MenuItem("STAGE2", []()
 		{
 			if (Game::Get().GetStageIndex() != (int)StageType::Stage2)
 			{
@@ -39,7 +39,7 @@ MenuLevel::MenuLevel()
 			// 스테이지 인덱스 정보를 Game 클래스에 저장.
 			Game::Get().SetStageIndex((int)StageType::Stage2);
 		}));
-	menuItems.emplace_back(new MenuItem("Stage3", []()
+	menuItems.emplace_back(new MenuItem("STAGE3", []()
 		{
 			if (Game::Get().GetStageIndex() != (int)StageType::Stage3)
 			{

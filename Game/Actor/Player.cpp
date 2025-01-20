@@ -27,9 +27,6 @@ void Player::Update(float deltaTime)
 		Game::Get().ToggleMenu();
 	}
 
-	// 공의 이전 프레임의 위치상태 저장 변수.
-	static int previousPositionY = position.y;
-
 	// y방향 좌표 딜레이.
 	static Timer yTimer(yDelayTime);
 
@@ -114,6 +111,4 @@ void Player::Update(float deltaTime)
 
 		xTimer.Reset();
 	}
-
-	previousPositionY = position.y;
 }
