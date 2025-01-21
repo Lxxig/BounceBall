@@ -12,6 +12,11 @@ public:
 
 	virtual void Update(float deltaTime) override;
 
+	inline void SetCurrentMaxBallUpCount(const int currentMaxBallUpCount)
+	{
+		this->currentMaxBallUpCount = currentMaxBallUpCount;
+	}
+
 private:
 	// 게임 레벨을 참조하는 변수.
 	GameLevel* refLevel = nullptr;
@@ -24,4 +29,5 @@ private:
 	bool isBallDown = true;
 	int ballUpCount = 0;
 	int maxBallUpCount = 3;
+	int currentMaxBallUpCount = maxBallUpCount;
 };

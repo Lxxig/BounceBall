@@ -60,9 +60,6 @@ private:
 	// MoveBlock
 	MoveBlock* moveBlock = nullptr;
 
-	// TargetPosition 무브블럭의 도착지의 좌표를 저장하는 변수.
-	std::vector<Vector2> moveBlockTargetPosition;
-
 	// MoveBlock의 수를 저장하는 변수.
 	int MoveBlockCount = -1;
 

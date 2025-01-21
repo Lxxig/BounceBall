@@ -98,9 +98,11 @@ void MenuLevel::Draw()
 	Vector2 cursorPositon(Engine::Get().ScreenSize().x / 2 - (int)strlen(printText) / 2, 0);
 	Engine::Get().Draw(cursorPositon, printText);
 
+	int i = 0;
 	for (int ix = 0; ix < menuItems.size(); ++ix)
 	{
 		Color setColor = (ix == currentIndex) ? selectedColor : unselectedColor;
-		Engine::Get().Draw(Vector2(2, ix+3), menuItems[ix]->menuText, setColor);
+		Engine::Get().Draw(Vector2(2, ix + 3 + i), menuItems[ix]->menuText, setColor);
+		++i;
 	}
 }

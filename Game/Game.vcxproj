@@ -179,13 +179,16 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="actor\Empty.cpp" />
+    <ClCompile Include="Actor\BlinkerBlock.cpp" />
+    <ClCompile Include="Actor\BlinkerThornBlock.cpp" />
     <ClCompile Include="Actor\ExtinctionBlock.cpp" />
+    <ClCompile Include="Actor\JumpBlock.cpp" />
     <ClCompile Include="Actor\MoveBlock.cpp" />
     <ClCompile Include="Actor\MoveBlock.h" />
     <ClCompile Include="actor\Player.cpp" />
     <ClCompile Include="actor\Block.cpp" />
     <ClCompile Include="Actor\Star.cpp" />
+    <ClCompile Include="Actor\TargetBlock.cpp" />
     <ClCompile Include="Actor\ThornBlock.cpp" />
     <ClCompile Include="Game\Game.cpp" />
     <ClCompile Include="Level\GameClearMenuLevel.cpp" />
@@ -195,11 +198,14 @@
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Actor\Empty.h" />
+    <ClInclude Include="Actor\BlinkerBlock.h" />
+    <ClInclude Include="Actor\BlinkerThornBlock.h" />
     <ClInclude Include="Actor\ExtinctionBlock.h" />
+    <ClInclude Include="Actor\JumpBlock.h" />
     <ClInclude Include="Actor\Player.h" />
     <ClInclude Include="Actor\Block.h" />
     <ClInclude Include="Actor\Star.h" />
+    <ClInclude Include="Actor\TargetBlock.h" />
     <ClInclude Include="Actor\ThornBlock.h" />
     <ClInclude Include="Game\Game.h" />
     <ClInclude Include="Level\GameClearMenuLevel.h" />

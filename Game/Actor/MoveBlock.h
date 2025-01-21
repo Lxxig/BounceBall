@@ -2,6 +2,7 @@
 
 #include <Actor/DrawableActor.h>
 #include <vector>
+#include <Engine/Timer.h>
 
 // 전방 선언.
 class GameLevel;
@@ -41,13 +42,8 @@ private:
 	bool isRight = true;
 
 	// 딜레이 시간 저장.
-	float delayTime = 0.5f;
+	float delayTime = 0.15f;
 
-	//// TargetPosition 무브블럭의 도착지의 좌표를 저장하는 변수.
-	//std::vector<Vector2> TargetPosition;
-
-	// @Todo: 시작 TargetPosition의 x좌표.
-	 
-	
-	// @Todo: 도착 TargetPosition의 x좌표.
+	// 타이머 변수.
+	Timer timer;
 };

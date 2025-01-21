@@ -2,10 +2,13 @@
 #include "Engine/Engine.h"
 #include "Game/Game.h"
 
-#include "Actor/Empty.h"
 #include "Actor/Block.h"
 #include "Actor/MoveBlock.h"
+#include "Actor/TargetBlock.h"
+#include "Actor/JumpBlock.h"
+#include "Actor/BlinkerBlock.h"
 #include "Actor/ThornBlock.h"
+#include "Actor/BlinkerThornBlock.h"
 #include "Actor/ExtinctionBlock.h"
 #include "Actor/Star.h"
 #include "Actor/Player.h"
@@ -16,6 +19,8 @@ GameLevel::GameLevel(int stageIndex)
 {
 	// 커서 감추기.
 	Engine::Get().SetCursorType(CursorType::NoCursor);
+
+	this->stageIndex = stageIndex;
 
 	// 맵 파일 불러와 레벨 로드.
 	// 파일 읽기.
@@ -80,32 +85,36 @@ GameLevel::GameLevel(int stageIndex)
 			continue;
 		}
 
-		// 블럭
-		// .: Empty
-		// 0: ThornBlock
-		// 1: Block
-		// e: ExtinctionBlock
+		// 블럭.
+		// .: 
+		// 0: ThornBlock 가시 블럭.
+		// 1: Block.
+		// e: ExtinctionBlock 밟으면 부서지는 블럭(소멸 블럭).
+		// j: JumpBlock 점프 강화.
+		// t: TargetBlock , t사이에 있는 블럭들이 무브 블럭이 된다.
+		// k: BlinkerBlock, 깜빡이는 블럭.
+		// K: BlinkerThornBlock, 깜빡이는 가시 블럭.
 		// 
 		// 아이템.
-		// 2: DoubleJump
-		// 5: Star
+		// 5: Star.
 
 		// 제거 처리를 해야하는 actor의 경우 메모리 관리를 추가로 해줘야 하기때문에
 		// map에는 포함시키지 않는다.
 		// map에는 메모리 관리를 해 줄 필요가 없는 액터들만 추가한다.
 
 
-		// 맵 문자가 t이면 MoveBlockStartPosition의 targetPosition에 저장 저장.
+		// 맵 문자가 t이면 TargetBlock액터 생성.
 		if (mapChar == 't')
 		{
+			TargetBlock* targetBlock = new TargetBlock(Vector2(xPosition, yPosition));
+			actors.emplace_back(targetBlock);
+			map.emplace_back(targetBlock);
+
 			// 맵 문자가 t이면 makeMoveBlock의 상태를 변경한다.
 			makeMoveBlock = !makeMoveBlock;
 
 			if (makeMoveBlock)
 			{
-				// t의 포지션을 저장.
-				moveBlockTargetPosition.push_back(Vector2(xPosition, yPosition));
-
 				if (moveBlock == nullptr)
 				{
 					// 무브블럭 액터 생성.
@@ -120,6 +129,7 @@ GameLevel::GameLevel(int stageIndex)
 				if (moveBlock == nullptr || moveBlock->GetBlockSize())
 				{
 					moveBlocks.emplace_back(moveBlock);
+					actors.emplace_back(moveBlock);
 					moveBlock = nullptr;
 				}
 			}
@@ -135,19 +145,33 @@ GameLevel::GameLevel(int stageIndex)
 				// t 111     t  -> 블럭 3개짜리 무브 블럭이 만들어진다.
 				moveBlock->SetMoveBlock(block);
 			}
-			//else
-			//{
-			//	// 무브블럭의 크기가 1 block 이상이면 moveBlocks에 포함
-			//	if (moveBlock == nullptr || moveBlock->GetBlockSize())
-			//	{
-			//		moveBlocks.emplace_back(moveBlock);
-			//		//actors.emplace_back(moveBlock);
-			//		moveBlock = nullptr;
-			//	}
-			//}
 
 			actors.emplace_back(block);
 			map.emplace_back(block);
+		}
+
+		// 맵 문자가 j이면 JumpBlock 액터 생성.
+		if (mapChar == 'j')
+		{
+			JumpBlock* jumpBlock = new JumpBlock(Vector2(xPosition, yPosition));
+			actors.emplace_back(jumpBlock);
+			map.emplace_back(jumpBlock);
+		}
+
+		// 맵 문자가 k이면 JumpBlock 액터 생성.
+		if (mapChar == 'k')
+		{
+			BlinkerBlock* blinkerBlock = new BlinkerBlock(Vector2(xPosition, yPosition));
+			actors.emplace_back(blinkerBlock);
+			map.emplace_back(blinkerBlock);
+		}
+
+		// 맵 문자가 K이면 JumpBlock 액터 생성.
+		if (mapChar == 'K')
+		{
+			BlinkerThornBlock* blinkerThornBlock = new BlinkerThornBlock(Vector2(xPosition, yPosition));
+			actors.emplace_back(blinkerThornBlock);
+			map.emplace_back(blinkerThornBlock);
 		}
 
 		// 맵 문자가 0이면 ThornBlock 액터 생성.
@@ -157,14 +181,6 @@ GameLevel::GameLevel(int stageIndex)
 			actors.emplace_back(thornBlock);
 			map.emplace_back(thornBlock);
 		}
-
-		// 맵 문자가 .이면 empty 액터 생성.
-		//else if (mapChar == '.')
-		//{
-		//	/*Empty* empty = new Empty(Vector2(xPosition, yPosition));
-		//	actors.emplace_back(empty);
-		//	map.emplace_back(empty);*/
-		//}
 
 		// 맵 문자가 e이면 ExtinctionBlock 액터 생성.
 		if (mapChar == 'e')
@@ -212,36 +228,11 @@ void GameLevel::Update(float deltaTime)
 
 	Super::Update(deltaTime);
 
-	for (auto* block : moveBlocks)
-	{
-		block->Update(deltaTime);
-	}
-
-
 	// 게임이 클리어 됐으면, 게임 클리어 메뉴에서 선택.
 	if (isGameClear)
 	{
-		// 대략 한 프레임 정도의 시간 대기.
-		static Timer timer(0.1f);
-		timer.Update(deltaTime);
-		if (!timer.IsTimeOut())
-		{
-			return;
-		}
-
-		const char* gameClearText = "GameClear!";
-		size_t gameClearTextLength = strlen(gameClearText);
-
-		// 커서 이동.
-		//Engine::Get().ScreenSize().y / 2 - 4
-		Vector2 cursorPosition(Engine::Get().ScreenSize().x / 2 - (int)gameClearTextLength / 2, Engine::Get().ScreenSize().y / 2 - 4);
-
-		// 메시지 출력.
-		Engine::Get().Draw(cursorPosition, gameClearText);
-
 		// 쓰레드 정지.
-		Sleep(2000);
-
+		Sleep(800);
 		// Level 전환.
 		Game::Get().ToggleGameClearOrOverMenu();
 		isGameOver = false;
@@ -249,25 +240,8 @@ void GameLevel::Update(float deltaTime)
 
 	if (isGameOver)
 	{
-		// 대략 한 프레임 정도의 시간 대기.
-		static Timer timer(0.1f);
-		timer.Update(deltaTime);
-		if (!timer.IsTimeOut())
-		{
-			return;
-		}
-
-		const char* GameOverText = "GameOver!";
-		size_t GameOverTextLength = strlen(GameOverText);
-
-		// 커서 이동.
-		Vector2 cursorPosition(Engine::Get().ScreenSize().x / 2 - (int)GameOverTextLength / 2, Engine::Get().ScreenSize().y / 2 - 4);
-
-		// 메시지 출력.
-		Engine::Get().Draw(cursorPosition, GameOverText);
-
 		// 쓰레드 정지.
-		Sleep(2000);
+		Sleep(800);
 
 		// Level 전환.
 		Game::Get().ToggleGameClearOrOverMenu();
@@ -281,6 +255,11 @@ void GameLevel::Draw()
 	snprintf(StageName, 10, "STAGE-%d", stageIndex + 1);
 	Vector2 cursorPositon(Engine::Get().ScreenSize().x / 2 - (int)strlen(StageName) / 2, 0);
 	Engine::Get().Draw(cursorPositon, StageName);
+
+	char StarState[15];
+	snprintf(StarState, 15, "STAR %d | %d", stageStarCount, starCount);
+	cursorPositon = Vector2(1, 1);
+	Engine::Get().Draw(cursorPositon, StarState);
 
 	for (auto* actor : actors)
 	{
@@ -308,6 +287,7 @@ bool GameLevel::CanPlayerMove(const Vector2& position)
 			// 메모리 해제.
 			(*it)->Destroy();
 			// stars벡터 내부에서 해제된 노드(요소)를 제거.
+
 			it = stars.erase(it);
 
 			++starCount;
@@ -360,17 +340,48 @@ bool GameLevel::CanPlayerMove(const Vector2& position)
 			return false;
 		}
 
+		// 검색한 액터가 BlinkerThornBlock인지 확인.
+		if (searchedActor->As<BlinkerThornBlock>())
+		{
+			// BlinkerThornBlock이 활성화 상태인지 확인.
+			if (searchedActor->As<BlinkerThornBlock>()->isShowedThornBlock())
+			{
+				isGameOver = true;
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		}
+
+		// 검색한 액터가 JumpBlock인지 확인.
+		if (searchedActor->As<JumpBlock>())
+		{
+			// 점프 높이를 두배 정도로 설정.
+			player->SetCurrentMaxBallUpCount(5);
+			return false;
+		}
+
+		// 검색한 액터가 BlinkerBlock인지 확인.
+		if (searchedActor->As<BlinkerBlock>())
+		{
+			// BlinkerBlock이 활성화 상태인지 확인.
+			if (searchedActor->As<BlinkerBlock>()->isShowedBlock())
+			{
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		}
+
 		// 검색한 액터가 Block지 확인.
 		if (searchedActor->As<Block>())
 		{
 			return false;
 		}
-
-		// 검색한 액터가 이동가능한 빈칸이면 이동,,.
-		/*if (searchedActor->As<Empty>())
-		{
-			return true;
-		}*/
 	}
 
 	// 빈칸이면.
@@ -385,7 +396,23 @@ bool GameLevel::CanMoveBlock(const Vector2& position)
 		return false;
 	}
 
-	if( position.x )
+	// 이동하려는 위치에 t가 있는지 확인.
+	DrawableActor* searchedActor = nullptr;
+	for (auto* actor : map)
+	{
+		if (actor->Position() == position)
+		{
+			searchedActor = actor;
+		}
+	}
+
+	if (searchedActor != nullptr)
+	{
+		if (searchedActor->As<TargetBlock>())
+		{
+			return false;
+		}
+	}
 	return true;
 }
 

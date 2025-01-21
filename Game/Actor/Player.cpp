@@ -63,8 +63,10 @@ void Player::Update(float deltaTime)
 			{
 				position.y -= 1;
 				++ballUpCount;
-				if (ballUpCount == maxBallUpCount)
+				if (ballUpCount == currentMaxBallUpCount)
 				{
+					// currentMaxBallUpCount가 점프 블럭이나 아이템 사용으로 변하게되면 다시 초기화.
+					currentMaxBallUpCount = maxBallUpCount;
 					ballUpCount = 0;
 					isBallDown = true;
 				}

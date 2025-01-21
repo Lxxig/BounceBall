@@ -24,9 +24,6 @@
     <ClCompile Include="level\GameLevel.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="actor\Empty.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="actor\Player.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -57,15 +54,24 @@
     <ClCompile Include="Actor\MoveBlock.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="Actor\TargetBlock.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Actor\JumpBlock.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Actor\BlinkerBlock.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Actor\BlinkerThornBlock.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Actor\Block.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Level\GameLevel.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Actor\Empty.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Actor\Player.h">
@@ -90,6 +96,18 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Actor\ExtinctionBlock.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Actor\TargetBlock.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Actor\JumpBlock.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Actor\BlinkerBlock.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Actor\BlinkerThornBlock.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

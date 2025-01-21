@@ -29,7 +29,7 @@ BOOL WINAPI MessageProcessor(DWORD message)
 Engine* Engine::instance = nullptr;
 
 Engine::Engine()
-	: quit(false), mainLevel(nullptr), screenSize(80, 20)
+	: quit(false), mainLevel(nullptr), screenSize(80, 22)
 {
 	// 랜덤 시드 설정.
 	srand((unsigned int)time(nullptr));
@@ -212,7 +212,7 @@ void Engine::Draw(const Vector2& position, const char* image, Color color)
 		int index = (position.y * (screenSize.x)) + position.x + ix;
 		
 		imageBuffer[index].Char.AsciiChar = image[ix];
-		imageBuffer[index].Attributes = (unsigned long)color;
+		imageBuffer[index].Attributes = (unsigned short)color;
 	}
 }
 

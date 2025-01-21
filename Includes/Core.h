@@ -1,5 +1,7 @@
 #pragma once
 
+#pragma warning (disable : 4251)
+
 #include <iostream>
 #include <Windows.h>
 
@@ -13,8 +15,9 @@ enum class Color
 	Red = FOREGROUND_RED,
 	Green = FOREGROUND_GREEN,
 	Blue = FOREGROUND_BLUE,
-	Brown = RGB(165, 42, 42),
+	Brown = 6,
 	Purple = 0x5,
+	Gray = 8,
 	LightYellow = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY,
 	LightAqua = FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY,
 	LightWhite = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY,

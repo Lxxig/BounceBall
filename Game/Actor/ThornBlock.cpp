@@ -1,9 +1,9 @@
 #include "ThornBlock.h"
 
 ThornBlock::ThornBlock(const Vector2& position)
-	:DrawableActor("i")
+	:DrawableActor("^")
 {
 	this->position = position;
 
-	color = Color::Blue;
+	color = Color::Brown;
 }

@@ -5,6 +5,7 @@
 class ENGINE_API Timer
 {
 public:
+	Timer() = default;
 	Timer(float time);
 
 	void Update(float deltaTime);
