@@ -5,7 +5,7 @@ BlinkerThornBlock::BlinkerThornBlock(const Vector2& position)
 {
 	this->position = position;
 
-	color = Color::Brown;
+	color = Color::Gray;
 
 	timer = Timer(delayTime);
 }

@@ -20,7 +20,7 @@ public:
 
 private:
 	// 깜빡이는지 확이하는 변수.
-	bool showBlock = true;
+	bool showBlock = false;
 
 	// 깜빡이는 로직에 delayTime 걸기.
 	Timer timer;

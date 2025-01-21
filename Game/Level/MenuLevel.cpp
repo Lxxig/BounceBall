@@ -94,15 +94,22 @@ void MenuLevel::Draw()
 	Super::Draw();
 
 	// 출력 될 위치.
-	const char* printText = "BounceBall";
-	Vector2 cursorPositon(Engine::Get().ScreenSize().x / 2 - (int)strlen(printText) / 2, 0);
-	Engine::Get().Draw(cursorPositon, printText);
+	const char* printText = "______                                  ______         _  _ ";
+	int cursorPositonX = Engine::Get().ScreenSize().x / 2 - (int)strlen(printText) / 2;
+	
+	Engine::Get().Draw(Vector2(cursorPositonX, 0), "______                                  ______         _  _ ");
+	Engine::Get().Draw(Vector2(cursorPositonX, 1), "| ___ \\                                 | ___ \\       | || |");
+	Engine::Get().Draw(Vector2(cursorPositonX, 2), "| |_/ /  ___   _   _  _ __    ___   ___ | |_/ /  __ _ | || |");
+	Engine::Get().Draw(Vector2(cursorPositonX, 3), "| ___ \\ / _ \\ | | | || '_ \\  / __| / _ \\| ___ \\ / _` || || |");
+	Engine::Get().Draw(Vector2(cursorPositonX, 4), "| |_/ /| (_) || |_| || | | || (__ |  __/| |_/ /| (_| || || |");	
+	Engine::Get().Draw(Vector2(cursorPositonX, 5), "\\____/  \\___/  \\__,_||_| |_| \\___| \\___|\\____/  \\__,_||_||_|");
 
 	int i = 0;
 	for (int ix = 0; ix < menuItems.size(); ++ix)
 	{
 		Color setColor = (ix == currentIndex) ? selectedColor : unselectedColor;
-		Engine::Get().Draw(Vector2(2, ix + 3 + i), menuItems[ix]->menuText, setColor);
+		Engine::Get().Draw(Vector2(1, ix + 10 + i), "|");
+		Engine::Get().Draw(Vector2(2, ix + 10 + i), menuItems[ix]->menuText, setColor);
 		++i;
 	}
 }

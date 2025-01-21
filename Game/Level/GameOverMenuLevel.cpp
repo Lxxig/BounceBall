@@ -59,16 +59,22 @@ void GameOverMenuLevel::Draw()
 	Super::Draw();
 
 	// 출력 될 위치.
-	const char* printText = "GameOverMenu";
-	Vector2 cursorPositon(Engine::Get().ScreenSize().x / 2 - (int)strlen(printText) / 2, 0);
-	Engine::Get().Draw(cursorPositon, printText);
+	const char* printText = "_____  _   _  _____ ______   _ ";
+	int cursorPositonX = Engine::Get().ScreenSize().x / 2 - (int)strlen(printText) / 2;
+
+	Engine::Get().Draw(Vector2(cursorPositonX, 0), " _____  _   _  _____ ______   _ ");
+	Engine::Get().Draw(Vector2(cursorPositonX, 1), "|  _  || | | ||  ___|| ___ \\ | |");
+	Engine::Get().Draw(Vector2(cursorPositonX, 2), "| | | || | | || |__  | |_/ / | |");
+	Engine::Get().Draw(Vector2(cursorPositonX, 3), "| | | || | | ||  __| |    /  | |");
+	Engine::Get().Draw(Vector2(cursorPositonX, 4), "\\ \\_/ /\\ \\_/ /| |___ | |\\ \\  |_|");
+	Engine::Get().Draw(Vector2(cursorPositonX, 5), " \\___/  \\___/ \\____/ \\_| \\_| (_)");
 
 	int i = 0;
 	for (int ix = 0; ix < menuItems.size(); ++ix)
 	{
-		//SetColor(ix == currentIndex ? selectedColor : unselectedColor);
 		Color setColor = (ix == currentIndex) ? selectedColor : unselectedColor;
-		Engine::Get().Draw(Vector2(2, ix + 3 + i), menuItems[ix]->menuText, setColor);
+		Engine::Get().Draw(Vector2(1, ix + 10 + i), "|");
+		Engine::Get().Draw(Vector2(2, ix + 10 + i), menuItems[ix]->menuText, setColor);
 		++i;
 	}
 }
