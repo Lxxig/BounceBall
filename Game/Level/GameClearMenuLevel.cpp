@@ -21,6 +21,9 @@ GameClearMenuLvel::GameClearMenuLvel()
 
 		// 메뉴로 돌아가기.
 		menuItems.emplace_back(new MenuItem("Menu", []() {
+			// stageIndex = -1;을 해주지 않으면 게임오버레벨 -> 메뉴 에서
+			// 기존의 레벨을 다시플레이 하지 못한다.
+			Game::Get().SetStageIndex(-1);
 			Game::Get().LoadLevel(new MenuLevel());
 			}));
 

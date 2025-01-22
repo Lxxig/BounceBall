@@ -9,6 +9,7 @@ class Player : public DrawableActor
 
 public:
 	Player(const Vector2& position, GameLevel* level);
+	~Player();
 
 	virtual void Update(float deltaTime) override;
 

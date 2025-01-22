@@ -10,6 +10,16 @@ Game* Game::instance = nullptr;
 Game::Game()
 	: Engine()
 {
+	// 배경음악 적용.
+	// bgm파일 읽어 오기.
+	auto error = mciSendString(TEXT("open \"../Assets/Sounds/Bgm.wav\" type mpegvideo alias bgm"), NULL, 0, NULL);
+	if (error)
+	{
+		char erorrMessage[256] = { };
+		sprintf_s(erorrMessage, 256, "ErrorCode: %d\n", error);
+		OutputDebugStringA(erorrMessage);
+	}
+
 	instance = this;
 	
 	stageAdress.emplace_back("../Assets/Maps/Stage1.txt");
@@ -50,6 +60,9 @@ Game::~Game()
 		delete menuLevel;
 		menuLevel = nullptr;
 	}
+
+	// 파일 닫기 (리소스 해제)
+	mciSendString(TEXT("close bgm"), NULL, 0, NULL);
 }
 
 void Game::LoadLevel(Level* newLevel)
@@ -106,7 +119,6 @@ void Game::ToggleMenu()
 void Game::ToggleGameClearOrOverMenu()
 {
 	system("cls");
-	//Clear();
 
 	// 게임을 클리어한 경우.
 	if(mainLevel->As<GameLevel>()->IsGameClear())

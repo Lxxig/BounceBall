@@ -29,6 +29,7 @@ private:
 	int stageIndex = -1;
 
 	Level* menuLevel = nullptr;
+
 	Level* backLevel = nullptr;
 
 	//Level* backGameClearMenuLevel = nullptr;

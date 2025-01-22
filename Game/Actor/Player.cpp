@@ -6,6 +6,9 @@
 
 #include "Level/MenuLevel.h"
 
+// 사운드 적용.
+#pragma comment(lib, "winmm.lib")
+
 Player::Player(const Vector2& position, GameLevel* level)
 	//: DrawableActor("●"), refLevel(level)
 	: DrawableActor("0"), refLevel(level)
@@ -15,6 +18,11 @@ Player::Player(const Vector2& position, GameLevel* level)
 
 	// 생상 설정.
 	color = Color::Green;
+}
+
+Player::~Player()
+{
+	mciSendString(TEXT("close jumpSound"), NULL, 0, NULL);
 }
 
 void Player::Update(float deltaTime)
@@ -61,6 +69,15 @@ void Player::Update(float deltaTime)
 				Vector2(position.x, position.y + -1))
 				)
 			{
+				if (ballUpCount == 0)
+				{
+					// 점프 사운드 파일 읽어오기.
+					mciSendString(TEXT("open \"../Assets/Sounds/JumpSound.wav\" type mpegvideo alias jumpSound"), NULL, 0, NULL);
+					// 점프 사운드 플레이(한 번만).
+					mciSendString(TEXT("play jumpSound from 0"), NULL, 0, NULL);
+					// 볼륨 소리 조절.
+					mciSendString(TEXT("setaudio jumpSound volume to 300"), NULL, 0, NULL);
+				}
 				position.y -= 1;
 				++ballUpCount;
 				if (ballUpCount == currentMaxBallUpCount)
@@ -74,6 +91,9 @@ void Player::Update(float deltaTime)
 			else
 			{
 				isBallDown = true;
+
+				// 블럭에 부딛히면 0으로 초기화.
+				ballUpCount = 0;
 			}
 
 			yTimer.Reset();

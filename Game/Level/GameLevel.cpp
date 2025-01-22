@@ -15,10 +15,24 @@
 
 #include "Engine/Timer.h"
 
+// 사운드
+//#include <windows.h>
+#pragma comment(lib, "winmm.lib")
+
 GameLevel::GameLevel(int stageIndex)
-{
+{	
 	// 커서 감추기.
 	Engine::Get().SetCursorType(CursorType::NoCursor);
+
+	// bgm 파일 반복 재생하기.
+	auto error = mciSendString(TEXT("play bgm repeat"), NULL, 0, NULL);
+	if (error)
+	{
+		char erorrMessage[256] = { };
+		sprintf_s(erorrMessage, 256, "ErrorCode: %d\n", error);
+		OutputDebugStringA(erorrMessage);
+	}
+	mciSendString(TEXT("setaudio bgm volume to 500"), NULL, 0, NULL);
 
 	this->stageIndex = stageIndex;
 
@@ -232,7 +246,18 @@ void GameLevel::Update(float deltaTime)
 	if (isGameClear)
 	{
 		// 쓰레드 정지.
-		Sleep(800);
+		Sleep(500);
+
+		// bgm 멈추기.
+		mciSendString(TEXT("stop bgm"), NULL, 0, NULL);
+
+		// gameOverSound 파일 읽어 오기
+		mciSendString(TEXT("open \"../Assets/Sounds/GameClearSound.mp3\" type mpegvideo alias gameClearSound"), NULL, 0, NULL);
+		// gameOverSound 플레이(한 번만).
+		mciSendString(TEXT("play gameClearSound from 0"), NULL, 0, NULL);
+		// 볼륨 소리 조절.
+		mciSendString(TEXT("setaudio gameClearSound volume to 500"), NULL, 0, NULL);
+
 		// Level 전환.
 		Game::Get().ToggleGameClearOrOverMenu();
 		isGameOver = false;
@@ -241,7 +266,17 @@ void GameLevel::Update(float deltaTime)
 	if (isGameOver)
 	{
 		// 쓰레드 정지.
-		Sleep(800);
+		Sleep(500);
+
+		// bgm 멈추기.
+		mciSendString(TEXT("stop bgm"), NULL, 0, NULL);
+
+		// gameOverSound 파일 읽어 오기
+		mciSendString(TEXT("open \"../Assets/Sounds/GameOverSound.mp3\" type mpegvideo alias gameOverSound"), NULL, 0, NULL);
+		// gameOverSound 플레이(한 번만).
+		mciSendString(TEXT("play gameOverSound from 0"), NULL, 0, NULL);
+		// 볼륨 소리 조절.
+		mciSendString(TEXT("setaudio gameOverSound volume to 500"), NULL, 0, NULL);
 
 		// Level 전환.
 		Game::Get().ToggleGameClearOrOverMenu();
@@ -257,7 +292,7 @@ void GameLevel::Draw()
 	Engine::Get().Draw(cursorPositon, StageName);
 
 	char StarState[15];
-	snprintf(StarState, 15, "STAR %d | %d", stageStarCount, starCount);
+	snprintf(StarState, 15, "STAR %d / %d", starCount, stageStarCount);
 	cursorPositon = Vector2(1, 1);
 	Engine::Get().Draw(cursorPositon, StarState);
 
@@ -291,6 +326,14 @@ bool GameLevel::CanPlayerMove(const Vector2& position)
 			it = stars.erase(it);
 
 			++starCount;
+
+			// ObtainStarSound 파일 읽어오기.
+			mciSendString(TEXT("open \"../Assets/Sounds/ObtainStarSounnd.mp3\" type mpegvideo alias obtainStarSounnd"), NULL, 0, NULL);
+			// ObtainStarSound 플레이(한 번만).
+			mciSendString(TEXT("play obtainStarSounnd from 0"), NULL, 0, NULL);
+
+			// 볼륨 소리 조절.
+			mciSendString(TEXT("setaudio obtainStarSounnd volume to 500"), NULL, 0, NULL);
 
 			return true;
 		}
